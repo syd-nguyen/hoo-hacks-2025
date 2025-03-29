@@ -14,14 +14,30 @@
     <style>
         body { margin: 0; overflow: hidden; }
         canvas { display: block; }
+        button {
+            position: absolute;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            padding: 10px 20px;
+            font-size: 18px;
+            background: #008CBA;
+            color: white;
+            border: none;
+            cursor: pointer;
+            border-radius: 10px;
+        }
     </style>
 </head>
 <body>
+    <button id="start-ar">Start AR</button>
+
+
     <script type="module">
 
         //Import Firebase SDKs
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.5.0/firebase-app.js";
-        import { getDatabase, ref, set } from "https://www.gstatic.com/firebasejs/11.5.0/firebase-database.js";
+        import { getDatabase, ref, push, onChildAdded } from "https://www.gstatic.com/firebasejs/11.5.0/firebase-database.js";
 
         //Firebase Configuration
         const firebaseConfig = {
@@ -36,7 +52,8 @@
 
         //Initialize Firebase
         const app = initializeApp(firebaseConfig);
-        const db = getDatabase(app);
+        const database = getDatabase(app);
+        const strokesRef = ref(database, 'strokes'); // Store drawn strokes
         
 
 
@@ -47,14 +64,97 @@
         // Set up Three.js scene
         const scene = new THREE.Scene();
         const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
-        const renderer = new THREE.WebGLRenderer({ alpha: true });
+        const renderer = new THREE.WebGLRenderer({ alpha: true, antialias: true });
         renderer.setSize(window.innerWidth, window.innerHeight);
+        renderer.xr.enabled = true; // Enable WebXR
         document.body.appendChild(renderer.domElement);
+
+        // Adds Lighting
+        const light = new THREE.HemisphereLight(0xffffff, 0xbbbbff, 1);
+        scene.add(light);
+
+        let controller; // User hand/controller
+        let isDrawing = false; // Drawing state
+
+       // Function to create a small sphere (brush stroke)
+       function createBrushStroke(position) {
+            const geometry = new THREE.SphereGeometry(0.01, 16, 16);
+            const material = new THREE.MeshStandardMaterial({ color: 0xff0000 });
+            const sphere = new THREE.Mesh(geometry, material);
+            sphere.position.copy(position);
+            scene.add(sphere);
+
+            // Store in Firebase
+            push(strokesRef, {
+                x: position.x,
+                y: position.y,
+                z: position.z
+            });
+        }
+
+        // Function to start AR session
+        async function startAR() {
+    try {
+        const session = await navigator.xr.requestSession('immersive-ar', { requiredFeatures: ['local-floor'] });
+        renderer.xr.setSession(session);
+
+        const referenceSpace = await session.requestReferenceSpace('local-floor');
+
+        // Loop through all input sources to attach controllers
+        session.addEventListener('selectstart', (event) => {
+            isDrawing = true;
+        });
+        session.addEventListener('selectend', (event) => {
+            isDrawing = false;
+        });
+
+        session.requestReferenceSpace('local').then((referenceSpace) => {
+            session.updateWorldTrackingState({
+                referenceSpace,
+            });
+
+            // Loop over the input sources and initialize controllers
+            session.inputSources.forEach((inputSource, index) => {
+                if (inputSource.targetRayMode === 'tracked-pointer') {
+                    const controller = renderer.xr.getController(index);
+                    scene.add(controller);
+
+                    controller.addEventListener('selectstart', () => isDrawing = true);
+                    controller.addEventListener('selectend', () => isDrawing = false);
+                }
+            });
+        });
+
+        console.log("AR Session Started");
+    } catch (error) {
+        console.error("AR Session failed", error);
+    }
+}
+
+        // Listen for new strokes from Firebase and display them
+        onChildAdded(strokesRef, (snapshot) => {
+            const data = snapshot.val();
+            const position = new THREE.Vector3(data.x, data.y, data.z);
+            createBrushStroke(position);
+        });
+
+        // Button to enter AR mode
+        document.getElementById('start-ar').addEventListener('click', startAR);
+        
+        
+        
+        
+        
+        
         
         // Render Loop
         function animate() {
-            requestAnimationFrame(animate);
-            renderer.render(scene, camera);
+            renderer.setAnimationLoop(() => {
+                if (controller && isDrawing) {
+                    createBrushStroke(controller.position); // Draw in AR
+                }
+                renderer.render(scene, camera);
+            });
         }
         animate();
     </script>
