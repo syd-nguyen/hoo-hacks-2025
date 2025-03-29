@@ -142,16 +142,19 @@
         });
 
         // Render Loop
-        function animate() {
+        async function animate() {
             renderer.setAnimationLoop(() => {
-                controllers.forEach(controller => {
-                    if (drawingStates[controller.id]) {
-                        createBrushStroke(controller.position); // Draw in AR
-                    }
-                });
-                renderer.render(scene, camera);
-            });
+                if (renderer.xr.isPresenting) {
+                    const camera = renderer.xr.getCamera();
+                    controllers.forEach(controller => {
+                        if (drawingStates[controller.id]) {
+                            createBrushStroke(controller.position); // Draw in AR
+                        }
+                    });
+                    renderer.render(scene, camera);
         }
+    });
+}
         animate();
     </script>
 </body>
