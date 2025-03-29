@@ -8,8 +8,7 @@
     <!-- Three.js for 3D Rendering -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
     
-    <!-- WebXR Polyfill for Browser Compatibility -->
-    <script src="https://cdn.jsdelivr.net/npm/webxr-polyfill@latest/dist/webxr-polyfill.js"></script>
+  
     
     <style>
         body { margin: 0; overflow: hidden; }
@@ -32,10 +31,21 @@
 <body>
     <button id="start-ar">Start AR</button>
 
+    <!-- WebXR Polyfill for Browser Compatibility -->
+    <script src='https://cdn.jsdelivr.net/npm/webxr-polyfill@latest/build/webxr-polyfill.js'></script>
+
+
     <script type="module">
         // Import Firebase SDKs
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.5.0/firebase-app.js";
         import { getDatabase, ref, push, onChildAdded } from "https://www.gstatic.com/firebasejs/11.5.0/firebase-database.js";
+
+        if (typeof WebXRPolyfill !== "undefined") {
+            const polyfill = new WebXRPolyfill();
+            console.log("WebXR Polyfill initialized successfully!");
+        } else {
+            console.error("WebXR Polyfill is not loaded correctly.");
+        }
 
         //Firebase Configuration
         const firebaseConfig = {
@@ -98,7 +108,6 @@
                 const session = await navigator.xr.requestSession('immersive-ar', { requiredFeatures: ['local-floor'] });
                 renderer.xr.setSession(session);
 
-                // Listen for input sources and controllers
                 session.addEventListener('selectstart', (event) => {
                     const controller = event.target;
                     drawingStates[controller.id] = true;
@@ -109,16 +118,17 @@
                     drawingStates[controller.id] = false;
                 });
 
-                // Loop over the input sources and initialize controllers
-                session.inputSources.forEach((inputSource, index) => {
-                    if (inputSource.targetRayMode === 'tracked-pointer') {
-                        const controller = renderer.xr.getController(index);
-                        controllers.push(controller);
-                        scene.add(controller);
+                session.addEventListener('inputsourceschange', () => {
+                    session.inputSources.forEach((inputSource, index) => {
+                        if (inputSource.targetRayMode === 'tracked-pointer') {
+                            const controller = renderer.xr.getController(index);
+                            controllers.push(controller);
+                            scene.add(controller);
 
-                        controller.addEventListener('selectstart', () => drawingStates[controller.id] = true);
-                        controller.addEventListener('selectend', () => drawingStates[controller.id] = false);
-                    }
+                            controller.addEventListener('selectstart', () => drawingStates[controller.id] = true);
+                            controller.addEventListener('selectend', () => drawingStates[controller.id] = false);
+                        }
+                    });
                 });
 
                 console.log("AR Session Started");
@@ -126,6 +136,7 @@
                 console.error("AR Session failed", error);
             }
         }
+
 
         // Listen for new strokes from Firebase and display them
         onChildAdded(strokesRef, (snapshot) => {
@@ -136,8 +147,9 @@
 
         // Button to enter AR mode
         document.getElementById('start-ar').addEventListener('click', () => {
+            console.log('AR button clicked');
             startAR();
-            document.getElementById('start-ar').disabled = true; // Disable the button once clicked
+            document.getElementById('start-ar').disabled = true;
             document.getElementById('start-ar').innerText = 'AR Session Started';
         });
 
