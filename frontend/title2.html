@@ -21,19 +21,28 @@
     </style>
 </head>
 <body>
-    <script>
-        // Initialize Firebase (Replace with your config)
+    <script type="module">
+
+        //Import Firebase SDKs
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.5.0/firebase-app.js";
+
+        //Firebase Configuration
         const firebaseConfig = {
-            apiKey: "YOUR_API_KEY",
-            authDomain: "YOUR_PROJECT_ID.firebaseapp.com",
-            databaseURL: "https://YOUR_PROJECT_ID.firebaseio.com",
-            projectId: "YOUR_PROJECT_ID",
-            storageBucket: "YOUR_PROJECT_ID.appspot.com",
-            messagingSenderId: "YOUR_MESSAGING_SENDER_ID",
-            appId: "YOUR_APP_ID"
+            apiKey: "AIzaSyDHyf3CWMJ-87FEbjcOd6bL3UP8hR28GKc",
+            authDomain: "hoohacks25-9dbc0.firebaseapp.com",
+            databaseURL: "https://hoohacks25-9dbc0-default-rtdb.firebaseio.com",
+            projectId: "hoohacks25-9dbc0",
+            storageBucket: "hoohacks25-9dbc0.firebasestorage.app",
+            messagingSenderId: "849605141019",
+            appId: "1:849605141019:web:f65b4782253322bd3b0ebe"
         };
-        firebase.initializeApp(firebaseConfig);
+
+        //Initialize Firebase
+        const app = initializeApp(firebaseConfig);
         const database = firebase.database();
+        
+
+
         
         // Initialize WebXR Polyfill
         const polyfill = new WebXRPolyfill();
