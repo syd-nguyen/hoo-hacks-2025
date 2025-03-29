@@ -16,5 +16,13 @@
 <body>
     <h1>Welcome to My Website!</h1>
     <p>This is my first web page.</p>
+
+    <p id="position">X: 0, Y: 0</p>
+
+    <script>
+        document.addEventListener("mousemove", (event) => {
+            document.getElementById("position").textContent = `X: ${event.clientX}, Y: ${event.clientY}`;
+        });
+    </script>
 </body>
 </html>
