@@ -87,6 +87,11 @@
             });
         }
 
+        if (!navigator.xr) {
+            alert("WebXR is not supported in this browser.");
+        }
+
+
         // Function to start AR session
         async function startAR() {
             try {
