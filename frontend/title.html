@@ -18,7 +18,59 @@
     <p>This is my first web page.</p>
 
     <p id="position">X: 0, Y: 0</p>
-
+    <!DOCTYPE html>
+    <html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Pixel Art Grid</title>
+        <style>
+            body {
+                text-align: center;
+                font-family: Arial, sans-serif;
+            }
+            #grid {
+                display: grid;
+                grid-template-columns: repeat(16, 20px); /* 16x16 Grid */
+                grid-template-rows: repeat(16, 20px);
+                gap: 1px;
+                margin: 20px auto;
+                width: fit-content;
+                background: #ccc;
+            }
+            .pixel {
+                width: 20px;
+                height: 20px;
+                background-color: white;
+                border: 1px solid #ddd;
+            }
+        </style>
+    </head>
+    <body>
+    
+        <h1>Pixel Art Grid</h1>
+        <div id="grid"></div>
+    
+        <script>
+            const grid = document.getElementById("grid");
+    
+            // Create 16x16 grid (256 pixels)
+            for (let i = 0; i < 16 * 16; i++) {
+                let pixel = document.createElement("div");
+                pixel.classList.add("pixel");
+    
+                // Click to change color
+                pixel.addEventListener("click", () => {
+                    pixel.style.backgroundColor = "black"; // Change this to any color
+                });
+    
+                grid.appendChild(pixel);
+            }
+        </script>
+    
+    </body>
+    </html>
+    
     <script>
         document.addEventListener("mousemove", (event) => {
             document.getElementById("position").textContent = `X: ${event.clientX}, Y: ${event.clientY}`;
