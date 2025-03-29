@@ -32,10 +32,8 @@
 <body>
     <button id="start-ar">Start AR</button>
 
-
     <script type="module">
-
-        //Import Firebase SDKs
+        // Import Firebase SDKs
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.5.0/firebase-app.js";
         import { getDatabase, ref, push, onChildAdded } from "https://www.gstatic.com/firebasejs/11.5.0/firebase-database.js";
 
@@ -50,17 +48,14 @@
             appId: "1:849605141019:web:f65b4782253322bd3b0ebe"
         };
 
-        //Initialize Firebase
+        // Initialize Firebase
         const app = initializeApp(firebaseConfig);
         const database = getDatabase(app);
         const strokesRef = ref(database, 'strokes'); // Store drawn strokes
-        
-
-
 
         // Initialize WebXR Polyfill
         const polyfill = new WebXRPolyfill();
-        
+
         // Set up Three.js scene
         const scene = new THREE.Scene();
         const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
@@ -73,11 +68,11 @@
         const light = new THREE.HemisphereLight(0xffffff, 0xbbbbff, 1);
         scene.add(light);
 
-        let controller; // User hand/controller
-        let isDrawing = false; // Drawing state
+        const controllers = []; // Array to hold multiple controllers
+        const drawingStates = {}; // Store drawing state for each controller
 
-       // Function to create a small sphere (brush stroke)
-       function createBrushStroke(position) {
+        // Function to create a small sphere (brush stroke)
+        function createBrushStroke(position) {
             const geometry = new THREE.SphereGeometry(0.01, 16, 16);
             const material = new THREE.MeshStandardMaterial({ color: 0xff0000 });
             const sphere = new THREE.Mesh(geometry, material);
@@ -94,42 +89,38 @@
 
         // Function to start AR session
         async function startAR() {
-    try {
-        const session = await navigator.xr.requestSession('immersive-ar', { requiredFeatures: ['local-floor'] });
-        renderer.xr.setSession(session);
+            try {
+                const session = await navigator.xr.requestSession('immersive-ar', { requiredFeatures: ['local-floor'] });
+                renderer.xr.setSession(session);
 
-        const referenceSpace = await session.requestReferenceSpace('local-floor');
+                // Listen for input sources and controllers
+                session.addEventListener('selectstart', (event) => {
+                    const controller = event.target;
+                    drawingStates[controller.id] = true;
+                });
 
-        // Loop through all input sources to attach controllers
-        session.addEventListener('selectstart', (event) => {
-            isDrawing = true;
-        });
-        session.addEventListener('selectend', (event) => {
-            isDrawing = false;
-        });
+                session.addEventListener('selectend', (event) => {
+                    const controller = event.target;
+                    drawingStates[controller.id] = false;
+                });
 
-        session.requestReferenceSpace('local').then((referenceSpace) => {
-            session.updateWorldTrackingState({
-                referenceSpace,
-            });
+                // Loop over the input sources and initialize controllers
+                session.inputSources.forEach((inputSource, index) => {
+                    if (inputSource.targetRayMode === 'tracked-pointer') {
+                        const controller = renderer.xr.getController(index);
+                        controllers.push(controller);
+                        scene.add(controller);
 
-            // Loop over the input sources and initialize controllers
-            session.inputSources.forEach((inputSource, index) => {
-                if (inputSource.targetRayMode === 'tracked-pointer') {
-                    const controller = renderer.xr.getController(index);
-                    scene.add(controller);
+                        controller.addEventListener('selectstart', () => drawingStates[controller.id] = true);
+                        controller.addEventListener('selectend', () => drawingStates[controller.id] = false);
+                    }
+                });
 
-                    controller.addEventListener('selectstart', () => isDrawing = true);
-                    controller.addEventListener('selectend', () => isDrawing = false);
-                }
-            });
-        });
-
-        console.log("AR Session Started");
-    } catch (error) {
-        console.error("AR Session failed", error);
-    }
-}
+                console.log("AR Session Started");
+            } catch (error) {
+                console.error("AR Session failed", error);
+            }
+        }
 
         // Listen for new strokes from Firebase and display them
         onChildAdded(strokesRef, (snapshot) => {
@@ -140,19 +131,15 @@
 
         // Button to enter AR mode
         document.getElementById('start-ar').addEventListener('click', startAR);
-        
-        
-        
-        
-        
-        
-        
+
         // Render Loop
         function animate() {
             renderer.setAnimationLoop(() => {
-                if (controller && isDrawing) {
-                    createBrushStroke(controller.position); // Draw in AR
-                }
+                controllers.forEach(controller => {
+                    if (drawingStates[controller.id]) {
+                        createBrushStroke(controller.position); // Draw in AR
+                    }
+                });
                 renderer.render(scene, camera);
             });
         }
