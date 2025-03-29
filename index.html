@@ -130,7 +130,11 @@
         });
 
         // Button to enter AR mode
-        document.getElementById('start-ar').addEventListener('click', startAR);
+        document.getElementById('start-ar').addEventListener('click', () => {
+            startAR();
+            document.getElementById('start-ar').disabled = true; // Disable the button once clicked
+            document.getElementById('start-ar').innerText = 'AR Session Started';
+        });
 
         // Render Loop
         function animate() {
