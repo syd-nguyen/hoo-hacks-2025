@@ -16,10 +16,141 @@
             height: 100vh;
         }
     </style>
-</head>
-<body>
     
-    <div style="color: white; width: 50% >Hi! What language would you like to practice today?</div>
+</head>
+<body onload="startWords()">
+    
+    <div id="mainDiv" style="color: white; width: 50%">
+        <!-- <p style="text-align: center" id="showType"></p> -->
+    </div>
 
+    <script>
+
+        /* to do:
+            make it so you can't continue when an input is needed
+                also validate the input
+            make it so skipping fast through is possible
+            add the rest of the prompts
+            connect to actual chat bot page
+            make design of chat bot page match up
+            add header and other website parts
+                add fun / cute images
+        */
+
+        var speed = 50;
+        var step = 0;
+        var continueAble = true; // set to false when user is supposed to input something
+
+        function startWords() {
+            zero();
+            document.addEventListener("click", function() { increment() } )
+            // click tracker calls type, type calls typeOut, typeOut calls showType
+        }
+
+        function zero() {
+            const node = document.createElement("p");
+            node.style.cssText = "text-align:center;";
+            node.id = "addedText";
+            showType(0, node, 'Hi there! :]');
+            setTimeout(function() {
+                const node2 = document.createElement("p");
+                node2.style.cssText = "text-align:center; opacity:50%";
+                node2.id = "addedText";
+                showType(0, node2, 'click or space to advance')
+            }, 1000);
+        }
+
+        function one() {
+            clear();
+            //document.getElementById("addedText").remove();
+            //document.getElementById("addedText").remove();
+            typeOut("Welcome to your AI chatbot for practicing languages!");
+        }
+
+        function two() {
+            clear();
+            //document.getElementById("addedText").remove();
+            typeOut("First, what language would you like to learn?");
+
+            const node = document.createElement("p");
+            node.style.cssText = "text-align:center; opacity:50%";
+            node.id = "addedText";
+            setTimeout(function() {
+                showType(0, node, 'type it in :O')
+            }, 3100);
+
+            const node2 = document.createElement("p");
+            node2.style.cssText = "text-align:center; color: #FB8500";
+            node2.id = "addedText";
+            var language = "";
+        
+            document.body.onkeydown = function(e) {
+                document.getElementById("mainDiv").append(node2);
+                if(e.key === "Enter"){
+                    increment();
+                    console.log("input is " + language);
+                }
+                    // add something here to save input for backend
+                if(e.key === 'Backspace') {
+                    console.log("backspace");
+                    language = language.substring(0, language.length-2);
+                } else {
+                    language += String.fromCharCode(e.which || e.keyCode).toLowerCase();
+                }
+                node2.innerHTML = language;
+
+            }
+        }
+
+        // remove all elements with the id "addedText"
+        function clear() {
+            const elements = document.querySelectorAll(`#${"addedText"}`);
+            elements.forEach(element => {
+                element.remove();
+            });
+        }
+
+        function increment() {
+            if(continueAble) {
+                step++;
+                console.log("step is " + step);
+
+                switch(step) {
+                    case 1:
+                        one();
+                        break;
+                    case 2: 
+                        two();
+                        break;
+                }
+            }
+        }
+
+        function typeOut(str) {           
+            const node = document.createElement("p");
+            node.style.cssText = "text-align:center;";
+            node.id = "addedText";
+            showType(0, node, str);
+        }
+
+        function showType(i, node, txt) {
+            
+            if(i < txt.length) {
+                //document.getElementById("showType").innerHTML += txt.charAt(i);
+                node.innerHTML += txt.charAt(i);
+                i++;
+                setTimeout(() => showType(i, node, txt), speed);
+            }
+            document.getElementById("mainDiv").append(node);
+
+        }
+
+        document.addEventListener('keypress', keyClicked);
+
+        function keyClicked(e) {
+            if(e.key === " ") increment();
+        }
+
+    </script>
 </body>
 </html>
