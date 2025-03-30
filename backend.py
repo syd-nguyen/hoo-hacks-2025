@@ -17,7 +17,7 @@ client = genai.Client(api_key=API_KEY)
 
 @app.route("/")
 def home():
-    return render_template("intro.html")
+    return render_template("index.html")
 
 @app.route("/chat", methods=["POST"])
 def chat():
@@ -26,11 +26,13 @@ def chat():
     if not data or "message" not in data:
         return jsonify({"error": "No message provided"}), 400
     user_message = data.get("message", "")
-    ai_response= generate_ai_response(user_message)
+    language = data.get("language", "english")
+    topic = data.get("topic", "general")
+    ai_response= generate_ai_response(user_message,language,topic)
     return jsonify({"response": ai_response })
     
 
-def generate_ai_response(user_message):
+def generate_ai_response(user_message,language,topic):
     #generate ai response
     if isinstance(user_message, dict):
         print("user_message is a dictionary:", user_message)
@@ -38,7 +40,7 @@ def generate_ai_response(user_message):
         user_message = str(user_message.get("text", ""))
     response = client.models.generate_content(
         model="gemini-2.0-flash",
-        contents=["You are role playing as having a conversation. I don't want to see you respond with anything outside of the role playing. (Use the japanese language with a middle school level proficiency. Also please don't translate your response. This is meant to be a learning tool.) Generate a short response (2-3 sentences) to this message as if you are having a conversation with this following message (make sure to reply TO the message and not just make up your own thing) ONLY and not the instructions:" + user_message]
+        contents=["You are role playing as having a conversation. I don't want to see you respond with anything outside of the role playing. (Use the " + language + " language with a middle school level proficiency. Also please don't translate your response. This is meant to be a learning tool.) Generate a short response (2-3 sentences) to this message as if you are having a conversation with this following message (make sure to reply TO the message and not just make up your own thing) ONLY and not the instructions:" + user_message]
     )
     # print("Generated response:", response)   Check what `response` is
     return response.text
