@@ -78,9 +78,27 @@
             <input type="text" id="userInput" placeholder="Type a message...">
             <button onclick="sendMessage()">Send</button>
         </div>
+
+        <div id="log"></div>
+
     </div>
 
     <script>
+
+        //const log = document.getElementById('log');
+
+        document.addEventListener('keypress', keyClicked);
+
+        function keyClicked(e) {
+            if(event.key === "Enter") sendMessage();
+            if(event.key === "/") { log.textContent += "slash ";
+                event.preventDefault();
+                document.getElementById("userInput").focus();
+            }
+            //log.textContent = "enter";
+            //else log.textContent += "not enter" //+= `${e.code}` + ' - ';
+        }
+
         function sendMessage() {
             const userInput = document.getElementById("userInput");
             const chatBox = document.getElementById("chatBox");

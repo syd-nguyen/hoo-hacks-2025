@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Website</title>
+
+    <style>
+
+        .button {
+            background-color: teal;
+            color: white"
+        }
+
+        .button1:hover {
+            background-color: white;
+            color: teal;
+        }
+    
+    </style>
+
+</head>
+
+<script>
+
+    cookies = 0;
+
+    function onClick() {
+        cookies++;
+        console.log(cookies + " cookies");
+    }
+
+</script>
+
+<body>    
+    <button onclick="onClick()" class="button button1" > click me</button>
+    <button> click me too </button>
+</body>
+</html>
