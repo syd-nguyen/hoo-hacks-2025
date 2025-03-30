@@ -39,7 +39,7 @@ def generate_ai_response(user_message,language):
         user_message = str(user_message.get("text", ""))
     response = client.models.generate_content(
         model="gemini-2.0-flash",
-        contents=["You are role playing as having a conversation. I don't want to see you respond with anything outside of the role playing. (Use the " + language + " language with a middle school level proficiency. Also please don't translate your response. This is meant to be a learning tool.) Generate a short response (2-3 sentences) to this message as if you are having a conversation with this following message (make sure to reply TO the message and not just make up your own thing) ONLY and not the instructions:" + user_message]
+        contents=["Imagine you're having a conversation with a user. The user just said: "+ user_message + ". Now, respond in a friendly and conversational manner, keeping the conversation going."]
     )
     # print("Generated response:", response)   Check what `response` is
     return response.text
