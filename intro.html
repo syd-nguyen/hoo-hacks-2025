@@ -107,7 +107,7 @@
             language = localStorage.getItem('language');
             topic = localStorage.getItem('topic');
             console.log("topic is " + topic);
-            document.getElementById("userInput").value = "please start a conversation with me in about " + topic + "";
+            document.getElementById("userInput").value = "what do you think about " + topic + "?";
             console.log("userInput is " + document.getElementById("userInput").value);
             sendMessage(false);
         }
