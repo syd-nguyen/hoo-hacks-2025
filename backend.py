@@ -42,3 +42,7 @@ def generate_ai_response(user_message):
     )
     # print("Generated response:", response)   Check what `response` is
     return response.text
+
+    if __name__ == "__main__":
+        app.run(host="0.0.0.0", port=5000, debug=True)
+
