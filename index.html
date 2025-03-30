@@ -87,7 +87,7 @@
             <label for="topic">Topic:</label>
             <input id="topic" name="topic"></input>
             
-            <button type="submit">Submit</button>
+            <button type="submit">Start New Conversation</button>
         </form>
 
         <div class="chat-header">AI Chatbot</div>
@@ -115,9 +115,6 @@
             //log.textContent += language;
         }
 
-
-
-
         document.addEventListener('keypress', keyClicked);
 
         function keyClicked(e) {
@@ -140,6 +137,13 @@
             userMessage.className = "chat-message user-message";
             userMessage.textContent = message;
             chatBox.appendChild(userMessage);
+
+            fetch('http://syd-nguyen.github.io/hoo-hacks-2025/chat')
+                .then(response => response.text)
+                .then(data => console.log(data));
+                //document.getElementById("response-text").innerText = data; // Display response
+        
+            //.catch(error => console.error("Error fetching data:", error));
             
             setTimeout(() => {
                 const botMessage = document.createElement("div");
@@ -151,6 +155,12 @@
             
             userInput.value = "";
         }
+
+        function displayMessage(message, sender){
+
+            fetch()
+        }
+
     </script>
 </body>
 </html>
