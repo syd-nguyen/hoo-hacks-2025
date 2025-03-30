@@ -96,8 +96,8 @@
 
         <div class="chat-box" id="chatBox"></div>
         <div class="chat-input">
-            <input type="text" id="userInput" placeholder="Type a message...">
-            <button onclick="sendMessage()">Send</button>
+            <input type="text" id="userInput" placeholder="Type a message..."></input>
+            <button onclick="sendMessage(true)">Send</button>
         </div>
 
     </div>
@@ -108,7 +108,11 @@
             var language = localStorage.getItem('language');
             var topic = localStorage.getItem('topic');
             console.log("topic is " + topic);
+            document.getElementById("userInput").value = "please start a conversation with me in " + language + " about " + topic + " and keep your response under 5 sentences";
+            console.log("userInput is " + document.getElementById("userInput").value);
+            sendMessage(false);
         }
+
 
         document.addEventListener('keypress', keyClicked);
 
@@ -120,16 +124,21 @@
             }
         }
 
-        function sendMessage() {
+        function sendMessage(showMessage) {
             const userInput = document.getElementById("userInput");
             const chatBox = document.getElementById("chatBox");
             const message = userInput.value.trim();
             if (message === "") return;
+
+            console.log("message sent: " + userInput);
+
             
-            const userMessage = document.createElement("div");
-            userMessage.className = "chat-message user-message";
-            userMessage.textContent = message;
-            chatBox.appendChild(userMessage);
+            if(showMessage) {
+                const userMessage = document.createElement("div");
+                userMessage.className = "chat-message user-message";
+                userMessage.textContent = message;
+                chatBox.appendChild(userMessage);
+            }
 
             fetch("https://hoo-hacks-2025.onrender.com/chat", {
                 method: "POST",
