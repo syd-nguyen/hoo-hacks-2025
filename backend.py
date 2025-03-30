@@ -17,7 +17,7 @@ client = genai.Client(api_key=API_KEY)
 
 @app.route("/")
 def home():
-    return render_template("intro.html")
+    return render_template("index.html")
 
 @app.route("/chat", methods=["POST"])
 def chat():
@@ -26,6 +26,8 @@ def chat():
     if not data or "message" not in data:
         return jsonify({"error": "No message provided"}), 400
     user_message = data.get("message", "")
+    language = data.get("language", "english")
+    topic = data.get("topic", "general")
     ai_response= generate_ai_response(user_message)
     return jsonify({"response": ai_response })
     
