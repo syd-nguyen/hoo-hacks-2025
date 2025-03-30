@@ -6,7 +6,7 @@
     <title>AI Chatbot</title>
     <style>
         body {
-            font-family: Arial, sans-serif;
+            font-family: Montserrat, sans-serif;
             background-color: #e0f7ff;
             margin: 0;
             display: flex;
@@ -71,7 +71,25 @@
     </style>
 </head>
 <body>
+
+    <!-- header -->
+
     <div class="chat-container">
+
+        <form id="myForm">
+
+            <label for="language">Language:</label>
+            <select id="language" name="language">
+                <option value="english">English</option>
+                <option value="japanese">Japanese</option>
+            </select>
+
+            <label for="topic">Topic:</label>
+            <input id="topic" name="topic"></input>
+            
+            <button type="submit">Submit</button>
+        </form>
+
         <div class="chat-header">AI Chatbot</div>
         <div class="chat-box" id="chatBox"></div>
         <div class="chat-input">
@@ -85,14 +103,27 @@
 
     <script>
 
-        //const log = document.getElementById('log');
+        // const log = document.getElementById('log');
+
+        document.getElementById("myForm").addEventListener("submit", submit);
+        
+        function submit(e) {
+            e.preventDefault();
+            const language = document.getElementById("language").value;
+            const topic = document.getElementById("topic").value;
+            console.log(language + " " + topic);
+            //log.textContent += language;
+        }
+
+
+
 
         document.addEventListener('keypress', keyClicked);
 
         function keyClicked(e) {
-            if(event.key === "Enter") sendMessage();
-            if(event.key === "/") { log.textContent += "slash ";
-                event.preventDefault();
+            if(e.key === "Enter") sendMessage();
+            if(e.key === "/") { 
+                e.preventDefault();
                 document.getElementById("userInput").focus();
             }
             //log.textContent = "enter";
@@ -113,7 +144,7 @@
             setTimeout(() => {
                 const botMessage = document.createElement("div");
                 botMessage.className = "chat-message bot-message";
-                botMessage.textContent = "Hello! How can I assist you?";
+                botMessage.textContent = "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Duis a ante mi. Sed consequat risus ut risus lobortis gravida. Sed ut tortor metus. Morbi commodo orci et ligula convallis tempor. Etiam ultricies augue vel pharetra rhoncus. Morbi mattis metus ut mi porttitor, vitae cursus neque varius. Vestibulum ultrices mauris neque, quis rhoncus ante vulputate vitae. Suspendisse maximus vel quam at vulputate.";
                 chatBox.appendChild(botMessage);
                 chatBox.scrollTop = chatBox.scrollHeight;
             }, 1000);
