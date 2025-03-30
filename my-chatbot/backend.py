@@ -14,7 +14,7 @@ client = genai.Client(api_key="AIzaSyBmfWgIR1BCF66sLIU3RqVODQFM3ybyqsk")
 def home():
     return render_template("index.html")
 
-@app.route("/chat", methods=['POST'])
+@app.route("/chat", methods=["POST"])
 def chat():
     data = request.json
     user_message = data.get("message", "")
