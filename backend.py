@@ -39,7 +39,7 @@ def generate_ai_response(user_message,language):
         user_message = str(user_message.get("text", ""))
     response = client.models.generate_content(
         model="gemini-2.0-flash",
-        contents=["Imagine you're having a conversation with a user. The user just said: " + user_message ". Now, respond in a friendly and conversational manner, keeping the conversation going about that same topic."]
+        contents=["Imagine you're having a conversation with a user. The user just said: " + user_message ". Now, respond in " + language ", acknowledging what the user said, and continue the conversation in a friendly manner."]
     )
     # print("Generated response:", response)   Check what `response` is
     return response.text
