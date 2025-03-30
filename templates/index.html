@@ -149,19 +149,20 @@
                 .then(response => response.json())
                 .then(data => {
                     console.log(data);
+                    setTimeout(() => {
+                        const botMessage = document.createElement("div");
+                        botMessage.className = "chat-message bot-message";
+                        botMessage.textContent = data.response;
+                        chatBox.appendChild(botMessage);
+                        chatBox.scrollTop = chatBox.scrollHeight;
+                    }, 1000);
                 })
                 .catch(error => console.error("Error:", error)); 
                 //document.getElementById("response-text").innerText = data; // Display response
         
             //.catch(error => console.error("Error fetching data:", error));
             
-            setTimeout(() => {
-                const botMessage = document.createElement("div");
-                botMessage.className = "chat-message bot-message";
-                botMessage.textContent = "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Duis a ante mi. Sed consequat risus ut risus lobortis gravida. Sed ut tortor metus. Morbi commodo orci et ligula convallis tempor. Etiam ultricies augue vel pharetra rhoncus. Morbi mattis metus ut mi porttitor, vitae cursus neque varius. Vestibulum ultrices mauris neque, quis rhoncus ante vulputate vitae. Suspendisse maximus vel quam at vulputate.";
-                chatBox.appendChild(botMessage);
-                chatBox.scrollTop = chatBox.scrollHeight;
-            }, 1000);
+            
             
             userInput.value = "";
         }

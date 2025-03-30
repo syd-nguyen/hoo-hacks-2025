@@ -1,4 +1,3 @@
 # hoo-hacks-2025
 
-hello there this is syd's test
-does this work
+Welcome to Syd and Kendall's Website!
