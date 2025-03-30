@@ -138,9 +138,19 @@
             userMessage.textContent = message;
             chatBox.appendChild(userMessage);
 
-            fetch('https://syd-nguyen.github.io/hoo-hacks-2025/chat')
-                .then(response => response.text)
-                .then(data => console.log(data));
+            fetch("https://syd-nguyen.github.io/hoo-hacks-2025/chat", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify({ message: userInput}),
+            })
+                
+                .then(response => response.json())
+                .then(data => {
+                    console.log(data);
+                })
+                .catch(error => console.error("Error:", error)); 
                 //document.getElementById("response-text").innerText = data; // Display response
         
             //.catch(error => console.error("Error fetching data:", error));
