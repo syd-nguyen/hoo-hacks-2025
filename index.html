@@ -3,211 +3,154 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Collaborative AR Canvas</title>
-    
-    <!-- Three.js for 3D Rendering -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
-    
+    <title>AI Chatbot</title>
     <style>
-        body { margin: 0; overflow: hidden; }
-        canvas { display: block; }
-        button {
-            position: absolute;
-            bottom: 20px;
-            left: 50%;
-            transform: translateX(-50%);
-            padding: 10px 20px;
-            font-size: 18px;
-            background: #008CBA;
+        body {
+            font-family: Montserrat, sans-serif;
+            background-color: #e0f7ff;
+            margin: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+        }
+        .chat-container {
+            width: 400px;
+            background: #ffffff;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+            border-radius: 10px;
+            overflow: hidden;
+        }
+        .chat-header {
+            background: #4da6ff;
+            color: white;
+            padding: 15px;
+            text-align: center;
+            font-size: 20px;
+        }
+        .chat-box {
+            height: 400px;
+            overflow-y: auto;
+            padding: 15px;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+        .chat-message {
+            padding: 10px;
+            border-radius: 10px;
+            max-width: 80%;
+        }
+        .user-message {
+            background: #4da6ff;
+            color: white;
+            align-self: flex-end;
+        }
+        .bot-message {
+            background: #f1f1f1;
+            color: black;
+            align-self: flex-start;
+        }
+        .chat-input {
+            display: flex;
+            border-top: 1px solid #ccc;
+        }
+        .chat-input input {
+            flex: 1;
+            padding: 10px;
+            border: none;
+            outline: none;
+        }
+        .chat-input button {
+            background: #4da6ff;
             color: white;
             border: none;
+            padding: 10px;
             cursor: pointer;
-            border-radius: 10px;
         }
     </style>
 </head>
 <body>
-   <!-- <button id="start-ar">Start AR</button> -->
 
-    <!-- WebXR Polyfill for Browser Compatibility -->
-    <script src='https://cdn.jsdelivr.net/npm/webxr-polyfill@latest/build/webxr-polyfill.js'></script>
+    <!-- header -->
 
-    <script type="module">
-        // Import Firebase SDKs
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.5.0/firebase-app.js";
-        import { getDatabase, ref, push, onChildAdded } from "https://www.gstatic.com/firebasejs/11.5.0/firebase-database.js";
+    <div class="chat-container">
+
+        <form id="myForm">
+
+            <label for="language">Language:</label>
+            <select id="language" name="language">
+                <option value="english">English</option>
+                <option value="japanese">Japanese</option>
+            </select>
+
+            <label for="topic">Topic:</label>
+            <input id="topic" name="topic"></input>
+            
+            <button type="submit">Submit</button>
+        </form>
+
+        <div class="chat-header">AI Chatbot</div>
+        <div class="chat-box" id="chatBox"></div>
+        <div class="chat-input">
+            <input type="text" id="userInput" placeholder="Type a message...">
+            <button onclick="sendMessage()">Send</button>
+        </div>
+
+        <div id="log"></div>
+
+    </div>
+
+    <script>
+
+        // const log = document.getElementById('log');
+
+        document.getElementById("myForm").addEventListener("submit", submit);
         
-        if (typeof WebXRPolyfill !== "undefined") {
-            const polyfill = new WebXRPolyfill();
-            console.log("WebXR Polyfill initialized successfully!");
-        } else {
-            console.error("WebXR Polyfill is not loaded correctly.");
+        function submit(e) {
+            e.preventDefault();
+            const language = document.getElementById("language").value;
+            const topic = document.getElementById("topic").value;
+            console.log(language + " " + topic);
+            //log.textContent += language;
         }
 
-        //Firebase Configuration
-        const firebaseConfig = {
-            apiKey: "AIzaSyDHyf3CWMJ-87FEbjcOd6bL3UP8hR28GKc",
-            authDomain: "hoohacks25-9dbc0.firebaseapp.com",
-            databaseURL: "https://hoohacks25-9dbc0-default-rtdb.firebaseio.com",
-            projectId: "hoohacks25-9dbc0",
-            storageBucket: "hoohacks25-9dbc0.firebasestorage.app",
-            messagingSenderId: "849605141019",
-            appId: "1:849605141019:web:f65b4782253322bd3b0ebe"
-        };
-
-        // Initialize Firebase
-        const app = initializeApp(firebaseConfig);
-        const database = getDatabase(app);
-        const strokesRef = ref(database, 'strokes'); // Store drawn strokes
-
-        // Initialize WebXR Polyfill
-        const polyfill = new WebXRPolyfill();
-
-        // Set up Three.js scene
-        const scene = new THREE.Scene();
-        const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
-        const renderer = new THREE.WebGLRenderer({ alpha: true, antialias: true });
-        renderer.setSize(window.innerWidth, window.innerHeight);
-        renderer.setAnimationLoop( animate );
-        renderer.xr.enabled = true; // Enable WebXR
-        document.body.appendChild(renderer.domElement);
-
-        // Adds Lighting
-        const light = new THREE.HemisphereLight(0xffffff, 0xbbbbff, 1);
-        scene.add(light);
-
-        let controller;
-        const controllers = []; // Array to hold multiple controllers
-        const drawingStates = {}; // Store drawing state for each controller
-
-        import { ARButton } from 'https://unpkg.com/three@0.126.0/examples/jsm/webxr/ARButton.js';
-
-        // Add the AR button to the body of the DOM
-		document.body.appendChild(ARButton.createButton(renderer));
-        
-        // Function to create a small sphere (brush stroke)
-        function createBrushStroke(position) {
-            const geometry = new THREE.SphereGeometry(16, 16, 16);
-            const material = new THREE.MeshStandardMaterial({ color: 0xff0000 });
-            const sphere = new THREE.Mesh(geometry, material);
-            sphere.position.copy(position);
-            scene.add(sphere);
-
-            // Store in Firebase
-            push(strokesRef, {
-                x: position.x,
-                y: position.y,
-                z: position.z
-            });
-        }
-
-        controller = renderer.xr.getController( 0 );
-		controller.addEventListener( 'select', onSelect );
-		scene.add( controller );
-
-        function onSelect() {
-            /*const geometry = new THREE.SphereGeometry(16, 16, 16);
-            const material = new THREE.MeshStandardMaterial({ color: 0xff0000 });
-            const sphere = new THREE.Mesh(geometry, material);
-            sphere.position.set( 0, 0, - 0.3 ).applyMatrix4( controller.matrixWorld );
-            //sphere.position.copy(position);
-            scene.add(sphere);*/
-
-            const material = new THREE.MeshPhongMaterial( { color: 0xffffff * Math.random() } );
-            const geometry = new THREE.CylinderGeometry( 0, 0.05, 0.2, 32 ).rotateX( Math.PI / 2 );
-            const mesh = new THREE.Mesh( geometry, material );
-					mesh.position.set( 0, 0, - 0.3 ).applyMatrix4( controller.matrixWorld );
-					mesh.quaternion.setFromRotationMatrix( controller.matrixWorld );
-					scene.add( mesh );
-
-        }
-
-        if (!navigator.xr) {
-            alert("WebXR is not supported in this browser.");
-        }
-
-        function animate() {
-
-				renderer.render( scene, camera );
-
-			}
-        
 
 
-        
 
+        document.addEventListener('keypress', keyClicked);
 
-/*
-
-        // Function to start AR session
-        async function startAR() {
-            try {
-
-                const session = await navigator.xr.requestSession('immersive-ar', { optionalFeatures: ['local-floor'] });
-                // big problem 1: google chrome doesn't support the session
-                // solution: download webxr api emulator on firefox (because it's been discontinued on google AHHHH)
-                renderer.xr.setSession(session);
-
-                session.addEventListener('selectstart', (event) => {
-                    const controller = event.target;
-                    drawingStates[controller.id] = true;
-                });
-
-                session.addEventListener('selectend', (event) => {
-                    const controller = event.target;
-                    drawingStates[controller.id] = false;
-                });
-
-                session.addEventListener('inputsourceschange', () => {
-                    session.inputSources.forEach((inputSource, index) => {
-                        if (inputSource.targetRayMode === 'tracked-pointer') {
-                            const controller = renderer.xr.getController(index);
-                            controllers.push(controller);
-                            scene.add(controller);
-
-                            controller.addEventListener('selectstart', () => drawingStates[controller.id] = true);
-                            controller.addEventListener('selectend', () => drawingStates[controller.id] = false);
-                        }
-                    });
-                });
-
-                console.log("AR Session Started");
-            } catch (error) {
-                console.error("AR Session failed", error);
+        function keyClicked(e) {
+            if(e.key === "Enter") sendMessage();
+            if(e.key === "/") { 
+                e.preventDefault();
+                document.getElementById("userInput").focus();
             }
+            //log.textContent = "enter";
+            //else log.textContent += "not enter" //+= `${e.code}` + ' - ';
         }
-*/
 
-        // Listen for new strokes from Firebase and display them
-        onChildAdded(strokesRef, (snapshot) => {
-            const data = snapshot.val();
-            const position = new THREE.Vector3(data.x, data.y, data.z);
-            createBrushStroke(position);
-        });
-
-       /* // Button to enter AR mode
-        document.getElementById('start-ar').addEventListener('click', () => {
-            console.log('AR button clicked');
-            startAR();
-            document.getElementById('start-ar').disabled = true;
-            document.getElementById('start-ar').innerText = 'AR Session Started';
-        });
-
-        // Render Loop
-        async function animate() {
-            renderer.setAnimationLoop(() => {
-                if (renderer.xr.isPresenting) {
-                    const camera = renderer.xr.getCamera();
-                    controllers.forEach(controller => {
-                        if (drawingStates[controller.id]) {
-                            createBrushStroke(controller.position); // Draw in AR
-                        }
-                    });
-                    renderer.render(scene, camera);
+        function sendMessage() {
+            const userInput = document.getElementById("userInput");
+            const chatBox = document.getElementById("chatBox");
+            const message = userInput.value.trim();
+            if (message === "") return;
+            
+            const userMessage = document.createElement("div");
+            userMessage.className = "chat-message user-message";
+            userMessage.textContent = message;
+            chatBox.appendChild(userMessage);
+            
+            setTimeout(() => {
+                const botMessage = document.createElement("div");
+                botMessage.className = "chat-message bot-message";
+                botMessage.textContent = "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Duis a ante mi. Sed consequat risus ut risus lobortis gravida. Sed ut tortor metus. Morbi commodo orci et ligula convallis tempor. Etiam ultricies augue vel pharetra rhoncus. Morbi mattis metus ut mi porttitor, vitae cursus neque varius. Vestibulum ultrices mauris neque, quis rhoncus ante vulputate vitae. Suspendisse maximus vel quam at vulputate.";
+                chatBox.appendChild(botMessage);
+                chatBox.scrollTop = chatBox.scrollHeight;
+            }, 1000);
+            
+            userInput.value = "";
         }
-    });
-}
-        animate(); */
     </script>
 </body>
 </html>
