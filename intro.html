@@ -115,7 +115,7 @@
         document.addEventListener('keypress', keyClicked);
 
         function keyClicked(e) {
-            if(e.key === "Enter") sendMessage();
+            if(e.key === "Enter") sendMessage(true);
             if(e.key === "/") { 
                 e.preventDefault();
                 document.getElementById("userInput").focus();
