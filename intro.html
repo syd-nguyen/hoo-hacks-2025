@@ -102,9 +102,10 @@
 
     <script>
         var language;
+        var topic;
         window.onload = function() {
             language = localStorage.getItem('language');
-            var topic = localStorage.getItem('topic');
+            topic = localStorage.getItem('topic');
             console.log("topic is " + topic);
             document.getElementById("userInput").value = "please start a conversation with me in " + language + " about " + topic + " and keep your response under 5 sentences";
             console.log("userInput is " + document.getElementById("userInput").value);
