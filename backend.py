@@ -37,6 +37,7 @@ def generate_ai_response(user_message,language):
         print("user_message is a dictionary:", user_message)
         # Extract the string or handle it accordingly, e.g., take the first string value
         user_message = str(user_message.get("text", ""))
+        print(f"User input: {user_message}")
     response = client.models.generate_content(
         model="gemini-2.0-flash",
         contents=["Imagine you're having a conversation with a user. The user just said: '{user_message}'. Now, respond in " + language ", acknowledging what the user said, and continue the conversation in a friendly manner."]
