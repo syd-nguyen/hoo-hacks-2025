@@ -17,7 +17,7 @@ client = genai.Client(api_key=API_KEY)
 
 @app.route("/")
 def home():
-    return render_template("index.html")
+    return render_template("intro.html")
 
 @app.route("/chat", methods=["POST"])
 def chat():
