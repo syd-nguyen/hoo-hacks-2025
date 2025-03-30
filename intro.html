@@ -30,9 +30,9 @@
             make it so you can't continue when an input is needed
                 also validate the input
             make it so skipping fast through is possible
-            add the rest of the prompts
-            connect to actual chat bot page
-            make design of chat bot page match up
+            ☑️ add the rest of the prompts
+            ☑️ connect to actual chat bot page
+            ⭐ make design of chat bot page match up
             add header and other website parts
                 add fun / cute images
         */
@@ -56,19 +56,19 @@
                 const node2 = document.createElement("p");
                 node2.style.cssText = "text-align:center; opacity:50%";
                 node2.id = "addedText";
-                showType(0, node2, 'click or space to advance')
+                showType(0, node2, 'click or enter to advance')
             }, 1000);
         }
 
         function one() {
-            clear();
+            //clear();
             //document.getElementById("addedText").remove();
             //document.getElementById("addedText").remove();
             typeOut("Welcome to your AI chatbot for practicing languages!");
         }
 
         function two() {
-            clear();
+            //clear();
             //document.getElementById("addedText").remove();
             typeOut("First, what language would you like to learn?");
 
@@ -85,21 +85,57 @@
             var language = "";
         
             document.body.onkeydown = function(e) {
+            // onkeydown allows for backspace functionality, but no capital letters
                 document.getElementById("mainDiv").append(node2);
                 if(e.key === "Enter"){
-                    increment();
                     console.log("input is " + language);
-                }
-                    // add something here to save input for backend
-                if(e.key === 'Backspace') {
+                    localStorage.setItem('language', language);
+                } else if (e.key === 'Backspace') {
                     console.log("backspace");
                     language = language.substring(0, language.length-2);
                 } else {
-                    language += String.fromCharCode(e.which || e.keyCode).toLowerCase();
+                    language += String.fromCharCode(e.which || e.keyCode).toLowerCase(); // keydown gives only capital letters, so change to lowercase
                 }
                 node2.innerHTML = language;
 
             }
+        }
+
+        function three(){
+            //clear();
+            typeOut("Great! Now, what do you want to talk about?");
+
+            const node = document.createElement("p");
+            node.style.cssText = "text-align:center; opacity:50%";
+            node.id = "addedText";
+            setTimeout(function() {
+                showType(0, node, 'type again :O')
+            }, 3100);
+
+            const node2 = document.createElement("p");
+            node2.style.cssText = "text-align:center; color: #FB8500";
+            node2.id = "addedText";
+            var topic = "";
+        
+            document.body.onkeydown = function(e) {
+            // onkeydown allows for backspace functionality, but no capital letters
+                document.getElementById("mainDiv").append(node2);
+                if(e.key === "Enter"){
+                    console.log("input is " + topic);
+                    localStorage.setItem('topic', topic);
+                } else if (e.key === 'Backspace') {
+                    console.log("backspace");
+                    topic = topic.substring(0, topic.length-2);
+                } else {
+                    topic += String.fromCharCode(e.which || e.keyCode).toLowerCase(); // keydown gives only capital letters, so change to lowercase
+                }
+                node2.innerHTML = topic;
+
+            }
+        }
+
+        function four(){
+            window.location.href = "index.html";
         }
 
         // remove all elements with the id "addedText"
@@ -112,6 +148,7 @@
 
         function increment() {
             if(continueAble) {
+                clear();
                 step++;
                 console.log("step is " + step);
 
@@ -121,6 +158,12 @@
                         break;
                     case 2: 
                         two();
+                        break;
+                    case 3: 
+                        three();
+                        break;
+                    case 4: 
+                        four();
                         break;
                 }
             }
@@ -148,7 +191,7 @@
         document.addEventListener('keypress', keyClicked);
 
         function keyClicked(e) {
-            if(e.key === " ") increment();
+            if(e.key === "Enter") increment();
         }
 
     </script>
