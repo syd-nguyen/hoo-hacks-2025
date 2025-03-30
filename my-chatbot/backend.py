@@ -16,7 +16,7 @@ def home():
 
 @app.route("/chat", methods=["POST"])
 def chat():
-    data = request.json
+    data = request.get_json()
     user_message = data.get("message", "")
     return jsonify({"response": generate_ai_response(user_message)})
     
