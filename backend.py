@@ -27,12 +27,11 @@ def chat():
         return jsonify({"error": "No message provided"}), 400
     user_message = data.get("message", "")
     language = data.get("language", "english")
-    topic = data.get("topic", "general")
-    ai_response= generate_ai_response(user_message,language,topic)
+    ai_response= generate_ai_response(user_message,language)
     return jsonify({"response": ai_response })
     
 
-def generate_ai_response(user_message,language,topic):
+def generate_ai_response(user_message,language):
     #generate ai response
     if isinstance(user_message, dict):
         print("user_message is a dictionary:", user_message)

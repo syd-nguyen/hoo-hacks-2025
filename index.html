@@ -142,7 +142,7 @@
                 headers: {
                     "Content-Type": "application/json",
                 },
-                body: JSON.stringify({ message: userInput, language, topic}),
+                body: JSON.stringify({ message, language, topic}),
             })
                 
                 .then(response => response.json())
