@@ -87,8 +87,6 @@
 </head>
 <body>
 
-    <!-- header -->
-
     <div class="chat-container">
 
         <div class="chat-header">AI Chatbot</div>
@@ -112,7 +110,6 @@
             console.log("userInput is " + document.getElementById("userInput").value);
             sendMessage(false);
         }
-
 
         document.addEventListener('keypress', keyClicked);
 
@@ -164,16 +161,14 @@
         
             //.catch(error => console.error("Error fetching data:", error));
             
-            
-            
             userInput.value = "";
         }
 
         function displayMessage(message, sender){
-
             fetch()
         }
 
     </script>
+    
 </body>
 </html>
